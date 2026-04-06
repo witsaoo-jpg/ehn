@@ -92,7 +92,19 @@
                         <p class="font-bold text-teal-800 text-lg mb-2">💡 หัวใจสำคัญ</p>
                         "การเชื่อมต่อหน้าเว็บเข้ากับ Google Sheets ผ่าน API ทำให้เรามีฐานข้อมูลฟรีที่จัดการง่ายเหมือน Excel"
                     </div>
-                    <p>ขั้นตอนคือการเขียน HTML เพื่อสร้างหน้าตา, ใช้ Tailwind ปรับความสวยงาม และใช้ JavaScript เชื่อมข้อมูล...</p>
+                    
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-300 text-center mt-8">
+                        <p class="text-slate-500 mb-4 text-sm">อ่านเนื้อหาแบบละเอียดหรือรับชม VDO ประกอบได้ที่นี่</p>
+                        <a href="https://drive.google.com/file/d/1Pw5xp5ivsReAivj7gGPsZrBE81LbwmWY/view?usp=drive_link" 
+                           target="_blank" 
+                           class="inline-flex items-center px-8 py-3 bg-[#0a1628] text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-lg">
+                            <svg class="w-5 h-5 mr-2 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            คลิกเพื่อเข้าสู่บทเรียนเพิ่มเติม
+                        </a>
+                    </div>
+                    <p class="mt-6">ขั้นตอนคือการเขียน HTML เพื่อสร้างหน้าตา, ใช้ Tailwind ปรับความสวยงาม และใช้ JavaScript เชื่อมข้อมูล...</p>
                 </div>
                 <button onclick="showPage('quiz')" class="mt-12 btn-teal px-12 py-4 rounded-2xl font-bold font-kanit text-lg">เข้าสู่แบบทดสอบ →</button>
             </div>
@@ -156,7 +168,6 @@
 </div>
 
 <script>
-    // --- เปลี่ยน URL นี้เป็น Web App URL ของพี่ที ---
     const API = "https://script.google.com/macros/s/AKfycbxVPlhAjR-IKddfB-hPcsjzr9nrLSHdUxHgr68sherHGL12DwvwqeZSg8V-QeJfuAen/exec";
     
     let user = null;
@@ -212,7 +223,6 @@
         const name = document.getElementById('login-name').value.trim();
         const pass = document.getElementById('login-pass').value.trim();
         
-        // Admin Shortcut
         if(name === "admin" && pass === "admin1234") { 
             user = { name: "Administrator", role: "admin", hospital: "รพ.ชลบุรี" }; 
             return loginSuccess(); 
