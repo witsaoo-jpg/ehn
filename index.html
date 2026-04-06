@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBH Learn — WebApp E-Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --navy: #0a1628; --teal: #00b4a6; --gold: #f5a623; }
+        * { font-family: 'Sarabun', sans-serif; }
+        h1, h2, h3, .font-kanit { font-family: 'Kanit', sans-serif; }
+        body { background: #f1f5f9; min-height: 100vh; overflow-x: hidden; }
+        
+        .sidebar { background: linear-gradient(180deg, var(--navy) 0%, #162e4a 100%); width: 250px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 50; transition: 0.3s; }
+        .main-content { margin-left: 250px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 2rem; width: calc(100% - 250px); }
+        
+        .page { width: 100%; max-width: 850px; display: none; }
+        .page.active { display: block; animation: zoomIn 0.3s ease; }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        .btn-teal { background: linear-gradient(135deg, var(--teal), #00d4c4); color: white; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 180, 166, 0.2); }
+        .btn-teal:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 180, 166, 0.3); }
+        
+        .input-box { width: 100%; padding: 0.8rem 1.2rem; border-radius: 0.75rem; border: 1.5px solid #e2e8f0; outline: none; transition: 0.2s; }
+        .input-box:focus { border-color: var(--teal); ring: 2px; ring-color: var(--teal); }
+
+        .option-btn { width: 100%; text-align: left; padding: 1.2rem; border: 1px solid #e2e8f0; border-radius: 1rem; background: white; margin-bottom: 0.75rem; transition: 0.2s; }
+        .option-btn:hover { border-color: var(--teal); background: #f0fdfa; }
+        .option-btn.correct { background: #dcfce7; border-color: #22c55e; color: #166534; font-weight: bold; }
+        .option-btn.wrong { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+
+        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; width: 100%; } .sidebar.open { transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+<div id="toast" class="fixed top-5 right-5 z- px-6 py-3 rounded-xl text-white font-bold opacity-0 transition-all shadow-2xl"></div>
+
+<div id="page-auth" class="flex items-center justify-center min-h-screen bg-[#0a1628] p-4">
+    <div class="bg-white w-full max-w-md p-8 rounded-[2.5rem] shadow-2xl">
+        <div class="text-center mb-8">
+            <div class="inline-block p-4 bg-teal-500 rounded-2xl mb-4">
+                <svg width="32" height="32" fill="white" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-navy font-kanit">CBH Learn</h1>
+            <p class="text-slate-400 text-sm mt-1">โรงพยาบาลชลบุรี — E-Learning</p>
+        </div>
+
+        <div class="flex mb-8 bg-slate-100 p-1 rounded-2xl">
+            <button onclick="switchTab('login')" id="tab-login" class="flex-1 py-2.5 rounded-xl text-sm font-bold bg-white shadow-sm transition-all">เข้าสู่ระบบ</button>
+            <button onclick="switchTab('reg')" id="tab-reg" class="flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-500 transition-all">ลงทะเบียน</button>
+        </div>
+
+        <div id="form-login" class="space-y-4">
+            <input id="login-name" type="text" placeholder="ชื่อ-นามสกุล" class="input-box">
+            <input id="login-pass" type="password" placeholder="รหัสผ่าน" class="input-box">
+            <button onclick="doLogin()" id="btn-login" class="btn-teal w-full py-4 rounded-xl font-bold font-kanit">เข้าสู่ระบบ</button>
+        </div>
+
+        <div id="form-reg" class="hidden space-y-4">
+            <input id="reg-name" type="text" placeholder="ชื่อ-นามสกุล" class="input-box">
+            <input id="reg-hosp" type="text" placeholder="ตึก / หน่วยงาน" class="input-box">
+            <input id="reg-pass" type="password" placeholder="ตั้งรหัสผ่าน (6 ตัวขึ้นไป)" class="input-box">
+            <button onclick="doRegister()" id="btn-reg" class="btn-teal w-full py-4 rounded-xl font-bold font-kanit">สมัครสมาชิก</button>
+        </div>
+    </div>
+</div>
+
+<div id="app-layout" class="hidden">
+    <aside id="sidebar" class="sidebar">
+        <div class="p-8 border-b border-white/10 text-white">
+            <h2 class="font-kanit font-bold text-xl tracking-tight">Dashboard</h2>
+            <div id="user-display" class="text-teal-400 text-xs mt-2 font-medium bg-teal-400/10 p-2 rounded-lg truncate"></div>
+        </div>
+        <nav class="p-4 space-y-2 mt-4">
+            <div class="p-4 text-white/70 hover:text-white cursor-pointer rounded-xl hover:bg-white/10 transition font-medium" onclick="showPage('lesson')">📖 บทเรียน</div>
+            <div class="p-4 text-white/70 hover:text-white cursor-pointer rounded-xl hover:bg-white/10 transition font-medium" onclick="showPage('quiz')">📝 แบบทดสอบ</div>
+            <div id="menu-cert" class="hidden p-4 text-white/70 hover:text-white cursor-pointer rounded-xl hover:bg-white/10 transition font-medium" onclick="showPage('cert')">🎓 ใบประกาศ</div>
+            <div id="menu-admin" class="hidden p-4 text-white/70 hover:text-white cursor-pointer rounded-xl hover:bg-white/10 transition font-medium border-t border-white/5 pt-6" onclick="showPage('admin')">⚙️ ระบบหลังบ้าน</div>
+            <div class="p-4 text-red-400 mt-10 cursor-pointer font-bold hover:bg-red-400/10 rounded-xl" onclick="location.reload()">🔒 ออกจากระบบ</div>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <section id="page-lesson" class="page active">
+            <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-200">
+                <h2 class="text-3xl font-bold text-navy mb-8 font-kanit">บทเรียน: การสร้าง WebApp E-Learning</h2>
+                <div class="prose text-slate-600 space-y-6 leading-relaxed">
+                    <p>พยาบาลสามารถสร้างระบบเรียนรู้ด้วยตนเองได้โดยใช้เทคโนโลยี **No-Cost Stack**...</p>
+                    <div class="bg-teal-50 p-8 rounded-[2rem] border-l-[10px] border-teal-500 shadow-inner">
+                        <p class="font-bold text-teal-800 text-lg mb-2">💡 หัวใจสำคัญ</p>
+                        "การเชื่อมต่อหน้าเว็บเข้ากับ Google Sheets ผ่าน API ทำให้เรามีฐานข้อมูลฟรีที่จัดการง่ายเหมือน Excel"
+                    </div>
+                    <p>ขั้นตอนคือการเขียน HTML เพื่อสร้างหน้าตา, ใช้ Tailwind ปรับความสวยงาม และใช้ JavaScript เชื่อมข้อมูล...</p>
+                </div>
+                <button onclick="showPage('quiz')" class="mt-12 btn-teal px-12 py-4 rounded-2xl font-bold font-kanit text-lg">เข้าสู่แบบทดสอบ →</button>
+            </div>
+        </section>
+
+        <section id="page-quiz" class="page">
+            <div class="bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-100 max-w-2xl mx-auto">
+                <div id="quiz-area">
+                    <div class="flex justify-between items-center mb-10">
+                        <div class="px-4 py-1 bg-teal-100 text-teal-600 rounded-full font-bold text-sm" id="q-count">ข้อที่ 1/10</div>
+                        <div class="text-3xl font-bold text-navy" id="q-score">0</div>
+                    </div>
+                    <div class="w-full bg-slate-100 h-3 rounded-full mb-10 overflow-hidden"><div id="q-progress" class="bg-teal-500 h-full transition-all duration-500" style="width:10%"></div></div>
+                    <p id="q-text" class="text-2xl font-bold mb-10 text-slate-800 font-kanit leading-snug"></p>
+                    <div id="q-opts" class="space-y-4"></div>
+                    <button id="btn-next" class="hidden mt-10 btn-teal w-full py-5 rounded-2xl font-bold text-lg font-kanit shadow-lg shadow-teal-500/30" onclick="nextQ()">ข้อถัดไป</button>
+                </div>
+                
+                <div id="quiz-result" class="hidden text-center py-10 space-y-8">
+                    <div id="res-icon" class="text-8xl animate-bounce"></div>
+                    <h2 id="res-title" class="text-4xl font-bold font-kanit"></h2>
+                    <div id="res-score" class="text-6xl font-black text-teal-500 bg-teal-50 inline-block px-10 py-5 rounded-3xl"></div>
+                    <div class="flex gap-4 justify-center pt-10">
+                        <button onclick="location.reload()" class="px-10 py-4 border-2 border-slate-200 rounded-2xl font-bold hover:bg-slate-50 transition">ลองใหม่อีกครั้ง</button>
+                        <button id="btn-cert" class="hidden btn-teal px-10 py-4 rounded-2xl font-bold font-kanit text-lg shadow-xl" onclick="showPage('cert')">รับใบประกาศ 🎓</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-cert" class="page">
+            <div class="flex flex-col items-center justify-center min-h-[75vh]">
+                <div id="cert-box" class="bg-white p-16 rounded-lg shadow-2xl border-[15px] border-double border-[#f5a623] relative max-w-[850px] w-full text-center">
+                    <h1 class="text-[#f5a623] text-sm font-bold tracking-[0.5em] uppercase mb-6">Certificate of Completion</h1>
+                    <div class="w-24 h-1 bg-[#f5a623] mx-auto mb-12"></div>
+                    <p class="italic text-slate-400 text-lg mb-4">ขอมอบประกาศนียบัตรฉบับนี้เพื่อแสดงว่า</p>
+                    <h2 id="c-name" class="text-5xl font-bold text-[#0a1628] my-8 border-b-4 border-slate-100 pb-6 inline-block px-12 font-kanit"></h2>
+                    <p class="text-slate-600 text-lg">สังกัด: <span id="c-hosp" class="font-bold text-navy"></span></p>
+                    <p class="text-slate-500 mt-10 text-lg leading-relaxed">ได้ผ่านการทดสอบหลักสูตรออนไลน์ <br><strong class="text-navy">"การสร้าง Web Application สำหรับงานพยาบาลเบื้องต้น"</strong></p>
+                    <div class="mt-16 flex justify-around px-12">
+                        <div class="text-center"><div class="w-32 h-px bg-slate-300 mb-2"></div><p class="text-xs text-slate-400">หัวหน้าพยาบาล</p></div>
+                        <div class="text-center"><p id="c-date" class="text-teal-600 font-bold mb-1"></p><p class="text-xs text-slate-400">วันที่ออกใบรับรอง</p></div>
+                    </div>
+                </div>
+                <button onclick="window.print()" class="mt-12 btn-teal px-14 py-5 rounded-[2rem] font-bold text-xl shadow-2xl shadow-teal-500/40">🖨️ พิมพ์ใบประกาศนียบัตร</button>
+            </div>
+        </section>
+
+        <section id="page-admin" class="page">
+            <h2 class="text-3xl font-bold mb-8 text-navy font-kanit">Admin: รายชื่อผู้สอบผ่าน</h2>
+            <div class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 text-slate-400 text-xs uppercase tracking-widest font-bold">
+                        <tr><th class="p-6">ชื่อ-นามสกุล</th><th class="p-6">ตึก/หน่วยงาน</th><th class="p-6">คะแนน</th><th class="p-6">สถานะ</th></tr>
+                    </thead>
+                    <tbody id="admin-table" class="divide-y divide-slate-100 text-sm"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    // --- เปลี่ยน URL นี้เป็น Web App URL ของพี่ที ---
+    const API = "https://script.google.com/macros/s/AKfycbxVPlhAjR-IKddfB-hPcsjzr9nrLSHdUxHgr68sherHGL12DwvwqeZSg8V-QeJfuAen/exec";
+    
+    let user = null;
+    let currQ = 0;
+    let score = 0;
+
+    const questions = [
+        { q: "หากเปรียบการสร้าง Web App เป็นบ้าน 'HTML' คือส่วนใด?", a: ["ตกแต่งบ้าน", "โครงสร้างบ้าน", "ระบบไฟฟ้า", "รั้วบ้าน"], c: 1 },
+        { q: "ภาษาที่ใช้กำหนดความสวยงาม สีสัน และการจัดวาง คือ?", a: ["HTML", "PHP", "JS", "CSS"], c: 3 },
+        { q: "JavaScript (JS) มีบทบาทอย่างไร?", a: ["สร้างเสาบ้าน", "ทำให้เว็บ 'คิด' และ 'โต้ตอบ' ได้", "เก็บข้อมูลถาวร", "พิมพ์เอกสาร"], c: 1 },
+        { q: "หัวใจสำคัญ 'CRUD' ตัวอักษร 'R' หมายถึง?", a: ["Record", "Run", "Read (แสดงข้อมูล)", "Reset"], c: 2 },
+        { q: "เครื่องมือใดทำหน้าที่เป็นฐานข้อมูล (Database) ฟรี?", a: ["GitHub", "Google Sheets", "Apps Script", "VS Code"], c: 1 },
+        { q: "'Front-end' เปรียบได้กับส่วนใดในร้านอาหาร?", a: ["ห้องครัว", "เด็กเสิร์ฟ", "ส่วนต้อนรับและโต๊ะอาหาร", "แคชเชียร์"], c: 2 },
+        { q: "บริการ Hosting ฟรีที่แนะนำให้ใช้คือ?", a: ["Facebook", "GitHub Pages", "Google Drive", "LINE"], c: 1 },
+        { q: "Web App ต่างจาก Website ทั่วไปอย่างไร?", a: ["ต้องโหลดแอปลงเครื่อง", "เน้นการโต้ตอบและประมวลผล", "อ่านได้อย่างเดียว", "ต้องเสียค่าสมัคร"], c: 1 },
+        { q: "API เปรียบได้กับพนักงานคนใด?", a: ["แม่บ้าน", "พนักงานเสิร์ฟ (ตัวกลางรับส่งข้อมูล)", "เจ้าของร้าน", "คนล้างจาน"], c: 1 },
+        { q: "ข้อควรระวังในการใช้ Google Sheets เป็นฐานข้อมูล?", a: ["ไม่ควรเก็บข้อมูลความลับสูง/รหัสผ่านสำคัญ", "ข้อมูลจะหายทุกวัน", "ห้ามมีข้อมูลเกิน 10 แถว", "ต้องจ่ายเงิน"], c: 0 }
+    ];
+
+    function switchTab(t) {
+        document.getElementById('form-login').classList.toggle('hidden', t==='reg');
+        document.getElementById('form-reg').classList.toggle('hidden', t==='login');
+        document.getElementById('tab-login').className = t==='login' ? "flex-1 py-2.5 rounded-xl text-sm font-bold bg-white shadow-sm" : "flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-500";
+        document.getElementById('tab-reg').className = t==='reg' ? "flex-1 py-2.5 rounded-xl text-sm font-bold bg-white shadow-sm" : "flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-500";
+    }
+
+    async function callAPI(p) {
+        try {
+            const r = await fetch(API, { method: "POST", body: JSON.stringify(p) });
+            return await r.json();
+        } catch(e) { 
+            return { success: false, message: "Server ไม่ตอบสนอง ลองอีกครั้ง" }; 
+        }
+    }
+
+    async function doRegister() {
+        const name = document.getElementById('reg-name').value.trim();
+        const hosp = document.getElementById('reg-hosp').value.trim();
+        const pass = document.getElementById('reg-pass').value.trim();
+        if(!name || !hosp || pass.length < 6) return showToast("กรุณากรอกข้อมูลให้ครบ (รหัส 6 ตัวขึ้นไป)", "bg-red-500");
+
+        btnLoading('btn-reg', true);
+        const res = await callAPI({ action:"register", name, hospital:hosp, password:pass });
+        if(res.success) { 
+            showToast("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ", "bg-green-600"); 
+            switchTab('login'); 
+            document.getElementById('login-name').value = name;
+        }
+        btnLoading('btn-reg', false);
+    }
+
+    async function doLogin() {
+        const name = document.getElementById('login-name').value.trim();
+        const pass = document.getElementById('login-pass').value.trim();
+        
+        // Admin Shortcut
+        if(name === "admin" && pass === "admin1234") { 
+            user = { name: "Administrator", role: "admin", hospital: "รพ.ชลบุรี" }; 
+            return loginSuccess(); 
+        }
+
+        btnLoading('btn-login', true);
+        const res = await callAPI({ action:"login", name, password:pass });
+        if(res.success) { 
+            user = res.user; 
+            loginSuccess(); 
+        } else { 
+            showToast(res.message, "bg-red-500"); 
+        }
+        btnLoading('btn-login', false);
+    }
+
+    function loginSuccess() {
+        document.getElementById('page-auth').classList.add('hidden');
+        document.getElementById('app-layout').classList.remove('hidden');
+        document.getElementById('user-display').innerText = `👤 ${user.name}`;
+        if(user.role === 'admin') document.getElementById('menu-admin').classList.remove('hidden');
+        showPage('lesson');
+    }
+
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-'+id).classList.add('active');
+        if(id==='quiz') startQuiz();
+        if(id==='admin') loadAdmin();
+        window.scrollTo(0,0);
+    }
+
+    function startQuiz() {
+        currQ = 0; score = 0;
+        document.getElementById('quiz-area').classList.remove('hidden');
+        document.getElementById('quiz-result').classList.add('hidden');
+        renderQ();
+    }
+
+    function renderQ() {
+        const q = questions[currQ];
+        document.getElementById('q-count').innerText = `ข้อที่ ${currQ+1}/10`;
+        document.getElementById('q-text').innerText = q.q;
+        document.getElementById('q-progress').style.width = ((currQ+1)*10) + "%";
+        document.getElementById('q-score').innerText = score;
+        document.getElementById('q-opts').innerHTML = q.a.map((o,i) => `<button class="option-btn" onclick="checkAns(${i})"><span class="font-bold mr-4 opacity-30">${i+1}.</span> ${o}</button>`).join('');
+        document.getElementById('btn-next').classList.add('hidden');
+    }
+
+    function checkAns(idx) {
+        const q = questions[currQ];
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        if(idx === q.c) { btns[idx].classList.add('correct'); score++; }
+        else { btns[idx].classList.add('wrong'); btns[q.c].classList.add('correct'); }
+        document.getElementById('btn-next').classList.remove('hidden');
+    }
+
+    function nextQ() {
+        currQ++;
+        if(currQ < 10) renderQ();
+        else finishQuiz();
+    }
+
+    async function finishQuiz() {
+        document.getElementById('quiz-area').classList.add('hidden');
+        document.getElementById('quiz-result').classList.remove('hidden');
+        const pass = score >= 8;
+        document.getElementById('res-icon').innerText = pass ? "🎉" : "😥";
+        document.getElementById('res-title').innerText = pass ? "ยินดีด้วย! คุณผ่านเกณฑ์" : "ยังไม่ผ่านเกณฑ์ พยายามใหม่นะ";
+        document.getElementById('res-score').innerText = `${score} / 10`;
+        if(pass) { 
+            document.getElementById('btn-cert').classList.remove('hidden'); 
+            document.getElementById('menu-cert').classList.remove('hidden'); 
+            fillCert(); 
+        }
+        await callAPI({ action:"saveScore", name: user.name, hospital: user.hospital, score: score });
+    }
+
+    function fillCert() {
+        document.getElementById('c-name').innerText = user.name;
+        document.getElementById('c-hosp').innerText = user.hospital || "โรงพยาบาลชลบุรี";
+        document.getElementById('c-date').innerText = new Date().toLocaleDateString('th-TH', {year:'numeric', month:'long', day:'numeric'});
+    }
+
+    async function loadAdmin() {
+        const res = await callAPI({ action: "getUsers" });
+        if(res.success) {
+            document.getElementById('admin-table').innerHTML = res.data.map(u => `
+                <tr><td class="p-6 font-bold text-navy">${u.name}</td><td class="p-6 text-slate-500">${u.hospital}</td>
+                <td class="p-6 font-black text-teal-600 text-lg">${u.score}/10</td>
+                <td class="p-6"><span class="px-4 py-1 rounded-full text-xs font-bold ${u.score>=8?'bg-green-100 text-green-600':'bg-red-100 text-red-600'}">${u.score>=8?'PASS':'FAIL'}</span></td></tr>
+            `).join('');
+        }
+    }
+
+    function showToast(m, c) {
+        const t = document.getElementById('toast');
+        t.innerText = m; t.className = `fixed top-5 right-5 z- px-8 py-4 rounded-2xl text-white font-bold opacity-100 transition-all ${c}`;
+        setTimeout(() => t.style.opacity = "0", 3000);
+    }
+
+    function btnLoading(id, b) {
+        document.getElementById(id).innerText = b ? "กำลังประมวลผล..." : (id==='btn-login'?"เข้าสู่ระบบ":"สมัครสมาชิก");
+        document.getElementById(id).disabled = b;
+    }
+</script>
+</body>
+</html>
