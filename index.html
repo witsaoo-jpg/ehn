@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CBH Learn — WebApp E-Learning</title>
+    <title>HN Learn — WebApp E-Learning</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -43,8 +43,8 @@
             <div class="inline-block p-4 bg-teal-500 rounded-2xl mb-4">
                 <svg width="32" height="32" fill="white" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
             </div>
-            <h1 class="text-3xl font-bold text-navy font-kanit">CBH Learn</h1>
-            <p class="text-slate-400 text-sm mt-1">โรงพยาบาลชลบุรี — E-Learning</p>
+            <h1 class="text-3xl font-bold text-navy font-kanit">HN Learn</h1>
+            <p class="text-slate-400 text-sm mt-1">พัฒนาโดย พว.วิษณุกรณ์ โอยา รพ.ชลบุรี</p>
         </div>
 
         <div class="flex mb-8 bg-slate-100 p-1 rounded-2xl">
@@ -95,15 +95,12 @@
                     
                     <div class="bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-300 text-center mt-8">
                         <p class="text-slate-500 mb-4 text-sm">อ่านเนื้อหาแบบละเอียดหรือรับชม VDO ประกอบได้ที่นี่</p>
-                        <a href="https://drive.google.com/file/d/1Pw5xp5ivsReAivj7gGPsZrBE81LbwmWY/view?usp=drive_link" 
-                           target="_blank" 
-                           class="inline-flex items-center px-8 py-3 bg-[#0a1628] text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-lg">
-                            <svg class="w-5 h-5 mr-2 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
+                        <a href="https://drive.google.com/file/d/1Pw5xp5ivsReAivj7gGPsZrBE81LbwmWY/view?usp=drive_link" target="_blank" class="inline-flex items-center px-8 py-3 bg-[#0a1628] text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-lg">
+                            <svg class="w-5 h-5 mr-2 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             คลิกเพื่อเข้าสู่บทเรียนเพิ่มเติม
                         </a>
                     </div>
+
                     <p class="mt-6">ขั้นตอนคือการเขียน HTML เพื่อสร้างหน้าตา, ใช้ Tailwind ปรับความสวยงาม และใช้ JavaScript เชื่อมข้อมูล...</p>
                 </div>
                 <button onclick="showPage('quiz')" class="mt-12 btn-teal px-12 py-4 rounded-2xl font-bold font-kanit text-lg">เข้าสู่แบบทดสอบ →</button>
@@ -244,6 +241,17 @@
         document.getElementById('app-layout').classList.remove('hidden');
         document.getElementById('user-display').innerText = `👤 ${user.name}`;
         if(user.role === 'admin') document.getElementById('menu-admin').classList.remove('hidden');
+        
+        // --- ส่วนที่เพิ่มใหม่: ตรวจสอบประวัติการสอบจาก Google Sheets ---
+        // เช็คว่า user.score ที่ส่งมาจากฝั่ง Backend (Google Apps Script) มีค่า >= 8 หรือไม่
+        if(user.score && parseInt(user.score) >= 8) {
+            const certMenu = document.getElementById('menu-cert');
+            certMenu.classList.remove('hidden');
+            certMenu.classList.add('text-[#f5a623]', 'font-bold', 'bg-white/5'); // เน้นสีทองให้รู้ว่าสอบผ่านแล้ว
+            certMenu.innerHTML = "🏆 ใบประกาศ (สอบผ่านแล้ว)";
+            fillCert(); // เติมชื่อลงใบประกาศรอไว้เลย
+        }
+
         showPage('lesson');
     }
 
@@ -295,8 +303,11 @@
         document.getElementById('res-title').innerText = pass ? "ยินดีด้วย! คุณผ่านเกณฑ์" : "ยังไม่ผ่านเกณฑ์ พยายามใหม่นะ";
         document.getElementById('res-score').innerText = `${score} / 10`;
         if(pass) { 
+            const certMenu = document.getElementById('menu-cert');
+            certMenu.classList.remove('hidden');
+            certMenu.classList.add('text-[#f5a623]', 'font-bold'); 
+            certMenu.innerHTML = "🏆 ใบประกาศ (สอบผ่านแล้ว)";
             document.getElementById('btn-cert').classList.remove('hidden'); 
-            document.getElementById('menu-cert').classList.remove('hidden'); 
             fillCert(); 
         }
         await callAPI({ action:"saveScore", name: user.name, hospital: user.hospital, score: score });
