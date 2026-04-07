@@ -35,12 +35,14 @@
         .overlay-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 40; backdrop-filter: blur(2px); }
         .overlay-bg.show { display: block; }
 
+        .input-hint { font-size: 0.72rem; color: #94a3b8; margin-top: 0.25rem; padding-left: 0.3rem; }
+
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); width: 260px; }
             .main-content { margin-left: 0; width: 100%; padding: 1rem; padding-top: 4.5rem; }
             .sidebar.open { transform: translateX(0); }
             .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 1.5rem; }
-            .table-wrap table { min-width: 650px; }
+            .table-wrap table { min-width: 750px; }
         }
 
         @media print {
@@ -61,6 +63,7 @@
     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
 </button>
 
+<!-- ===== AUTH PAGE ===== -->
 <div id="page-auth" class="flex items-center justify-center min-h-screen bg-[#0a1628] p-4">
     <div class="bg-white w-full max-w-md p-6 md:p-8 rounded-[2rem] shadow-2xl">
         <div class="text-center mb-6">
@@ -76,21 +79,39 @@
             <button onclick="switchTab('reg')" id="tab-reg" class="flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-500 transition-all">ลงทะเบียน</button>
         </div>
 
+        <!-- Login Form -->
         <div id="form-login" class="space-y-3">
-            <input id="login-name" type="text" placeholder="ชื่อ-นามสกุล" class="input-box" onkeydown="if(event.key==='Enter')doLogin()">
-            <input id="login-pass" type="password" placeholder="รหัสผ่าน" class="input-box" onkeydown="if(event.key==='Enter')doLogin()">
+            <div>
+                <input id="login-username" type="text" placeholder="ชื่อ Login" class="input-box" onkeydown="if(event.key==='Enter')doLogin()">
+            </div>
+            <div>
+                <input id="login-pass" type="password" placeholder="รหัสผ่าน" class="input-box" onkeydown="if(event.key==='Enter')doLogin()">
+            </div>
             <button onclick="doLogin()" id="btn-login" class="btn-teal w-full py-4 rounded-xl font-bold font-kanit text-base">เข้าสู่ระบบ</button>
         </div>
 
+        <!-- Register Form -->
         <div id="form-reg" class="hidden space-y-3">
-            <input id="reg-name" type="text" placeholder="ชื่อ-นามสกุล" class="input-box">
-            <input id="reg-hosp" type="text" placeholder="ตึก / หน่วยงาน" class="input-box">
-            <input id="reg-pass" type="password" placeholder="ตั้งรหัสผ่าน (6 ตัวขึ้นไป)" class="input-box">
+            <div>
+                <input id="reg-fullname" type="text" placeholder="ชื่อ-นามสกุลจริง" class="input-box">
+                <p class="input-hint">📋 ใช้แสดงในใบประกาศนียบัตร</p>
+            </div>
+            <div>
+                <input id="reg-username" type="text" placeholder="ชื่อ Login" class="input-box">
+                <p class="input-hint">🔑 ใช้สำหรับเข้าสู่ระบบ (ตั้งเองได้)</p>
+            </div>
+            <div>
+                <input id="reg-hosp" type="text" placeholder="ตึก / หน่วยงาน" class="input-box">
+            </div>
+            <div>
+                <input id="reg-pass" type="password" placeholder="ตั้งรหัสผ่าน (6 ตัวขึ้นไป)" class="input-box">
+            </div>
             <button onclick="doRegister()" id="btn-reg" class="btn-teal w-full py-4 rounded-xl font-bold font-kanit text-base">สมัครสมาชิก</button>
         </div>
     </div>
 </div>
 
+<!-- ===== APP LAYOUT ===== -->
 <div id="app-layout" class="hidden">
     <aside id="sidebar" class="sidebar">
         <div class="p-5 border-b border-white/10 text-white">
@@ -107,6 +128,8 @@
     </aside>
 
     <main class="main-content">
+
+        <!-- ===== LESSON PAGE ===== -->
         <section id="page-lesson" class="page active">
             <div class="bg-white p-5 md:p-10 rounded-[2rem] shadow-sm border border-slate-200">
                 <h2 class="text-xl md:text-3xl font-bold text-navy mb-6 font-kanit">บทเรียน: การสร้าง WebApp E-Learning</h2>
@@ -129,6 +152,7 @@
             </div>
         </section>
 
+        <!-- ===== QUIZ PAGE ===== -->
         <section id="page-quiz" class="page">
             <div class="bg-white p-5 md:p-8 rounded-[2rem] shadow-xl border border-slate-100 max-w-2xl mx-auto">
                 <div id="quiz-area">
@@ -153,6 +177,7 @@
             </div>
         </section>
 
+        <!-- ===== CERT PAGE ===== -->
         <section id="page-cert" class="page">
             <div class="flex flex-col items-center justify-center min-h-[70vh]">
                 <div id="cert-box" class="bg-white p-6 md:p-12 rounded-lg shadow-2xl border-[12px] border-double border-[#f5a623] relative max-w-[800px] w-full text-center">
@@ -171,13 +196,15 @@
             </div>
         </section>
 
+        <!-- ===== ADMIN PAGE ===== -->
         <section id="page-admin" class="page">
             <h2 class="text-xl md:text-3xl font-bold mb-6 text-navy font-kanit">ระบบจัดการผู้เรียน</h2>
             <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 table-wrap">
                 <table class="w-full text-left">
                     <thead class="bg-slate-50 text-slate-500 text-[10px] md:text-xs uppercase tracking-widest font-bold">
                         <tr>
-                            <th class="p-3 md:p-5">ชื่อ-นามสกุล</th>
+                            <th class="p-3 md:p-5">ชื่อ Login</th>
+                            <th class="p-3 md:p-5">ชื่อ-นามสกุลจริง</th>
                             <th class="p-3 md:p-5">หน่วยงาน</th>
                             <th class="p-3 md:p-5">รหัสผ่าน</th>
                             <th class="p-3 md:p-5">คะแนน</th>
@@ -188,11 +215,11 @@
                 </table>
             </div>
         </section>
+
     </main>
 </div>
 
 <script>
-    // อัปเดต API เป็นเวอร์ชันล่าสุดที่พี่ตี้ให้มาแล้วครับ
     const API = "https://script.google.com/macros/s/AKfycbxVPlhAjR-IKddfB-hPcsjzr9nrLSHdUxHgr68sherHGL12DwvwqeZSg8V-QeJfuAen/exec";
 
     let loggedUser = null;
@@ -212,6 +239,7 @@
         { q: "ข้อควรระวังในการใช้ Google Sheets เป็นฐานข้อมูล?", a: ["ไม่ควรเก็บข้อมูลความลับสูง/รหัสผ่านสำคัญ", "ข้อมูลจะหายทุกวัน", "ห้ามมีข้อมูลเกิน 10 แถว", "ต้องจ่ายเงิน"], c: 0 }
     ];
 
+    // ===== SIDEBAR =====
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('overlay-bg').classList.toggle('show');
@@ -221,13 +249,19 @@
         document.getElementById('overlay-bg').classList.remove('show');
     }
 
+    // ===== AUTH TABS =====
     function switchTab(t) {
         document.getElementById('form-login').classList.toggle('hidden', t === 'reg');
         document.getElementById('form-reg').classList.toggle('hidden', t === 'login');
-        document.getElementById('tab-login').className = t === 'login' ? "flex-1 py-2.5 rounded-xl text-sm font-bold bg-white shadow-sm" : "flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-500";
-        document.getElementById('tab-reg').className = t === 'reg' ? "flex-1 py-2.5 rounded-xl text-sm font-bold bg-white shadow-sm" : "flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-500";
+        document.getElementById('tab-login').className = t === 'login'
+            ? "flex-1 py-2.5 rounded-xl text-sm font-bold bg-white shadow-sm"
+            : "flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-500";
+        document.getElementById('tab-reg').className = t === 'reg'
+            ? "flex-1 py-2.5 rounded-xl text-sm font-bold bg-white shadow-sm"
+            : "flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-500";
     }
 
+    // ===== API CALL =====
     async function callAPI(p) {
         try {
             const r = await fetch(API, { method: "POST", body: JSON.stringify(p) });
@@ -237,55 +271,60 @@
         }
     }
 
+    // ===== REGISTER =====
     async function doRegister() {
-        var nm = document.getElementById('reg-name').value.trim();
+        var fn = document.getElementById('reg-fullname').value.trim();
+        var un = document.getElementById('reg-username').value.trim();
         var hp = document.getElementById('reg-hosp').value.trim();
         var pw = document.getElementById('reg-pass').value.trim();
-        if (!nm || !hp || pw.length < 6) return showToast("กรุณากรอกข้อมูลให้ครบ (รหัส 6 ตัวขึ้นไป)", "bg-red-500");
+
+        if (!fn || !un || !hp || pw.length < 6)
+            return showToast("กรุณากรอกข้อมูลให้ครบ (รหัสผ่าน 6 ตัวขึ้นไป)", "bg-red-500");
 
         btnLoading('btn-reg', true);
-        var res = await callAPI({ action: "register", name: nm, hospital: hp, password: pw });
+        var res = await callAPI({ action: "register", fullname: fn, username: un, hospital: hp, password: pw });
         if (res.success) {
             showToast("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ", "bg-green-600");
             switchTab('login');
-            document.getElementById('login-name').value = nm;
+            document.getElementById('login-username').value = un;
         } else {
             showToast(res.message || "เกิดข้อผิดพลาด", "bg-red-500");
         }
         btnLoading('btn-reg', false);
     }
 
+    // ===== LOGIN =====
     async function doLogin() {
-        var nm = document.getElementById('login-name').value.trim();
+        var un = document.getElementById('login-username').value.trim();
         var pw = document.getElementById('login-pass').value.trim();
-        if (!nm || !pw) return showToast("กรุณากรอกชื่อและรหัสผ่าน", "bg-red-500");
+        if (!un || !pw) return showToast("กรุณากรอกชื่อ Login และรหัสผ่าน", "bg-red-500");
 
-        if (nm === "admin" && pw === "admin1234") {
-            loggedUser = { name: "Administrator", role: "admin", hospital: "ผู้ดูแลระบบ", score: 0 };
+        if (un === "admin" && pw === "admin1234") {
+            loggedUser = { username: "admin", fullname: "Administrator", role: "admin", hospital: "ผู้ดูแลระบบ", score: 0 };
             return afterLogin();
         }
 
         btnLoading('btn-login', true);
-        var res = await callAPI({ action: "login", name: nm, password: pw });
+        var res = await callAPI({ action: "login", username: un, password: pw });
         if (res.success) {
             loggedUser = res.user;
             afterLogin();
         } else {
-            showToast(res.message || "ชื่อหรือรหัสผ่านไม่ถูกต้อง", "bg-red-500");
+            showToast(res.message || "ชื่อ Login หรือรหัสผ่านไม่ถูกต้อง", "bg-red-500");
         }
         btnLoading('btn-login', false);
     }
 
+    // ===== AFTER LOGIN =====
     function afterLogin() {
         document.getElementById('page-auth').classList.add('hidden');
         document.getElementById('app-layout').classList.remove('hidden');
-        document.getElementById('user-display').innerText = "👤 " + loggedUser.name;
+        document.getElementById('user-display').innerText = "👤 " + (loggedUser.fullname || loggedUser.username);
         document.getElementById('mobile-menu-btn').classList.remove('hidden');
 
         if (loggedUser.role === 'admin') {
             document.getElementById('menu-admin').classList.remove('hidden');
         }
-
         if (loggedUser.score && parseInt(loggedUser.score) >= 8) {
             var cm = document.getElementById('menu-cert');
             cm.classList.remove('hidden');
@@ -293,10 +332,10 @@
             cm.innerHTML = "🏆 ใบประกาศของคุณ";
             fillCert();
         }
-
         showPage('lesson');
     }
 
+    // ===== PAGE NAVIGATION =====
     function showPage(id) {
         document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
         document.getElementById('page-' + id).classList.add('active');
@@ -306,6 +345,7 @@
         window.scrollTo(0, 0);
     }
 
+    // ===== QUIZ =====
     function startQuiz() {
         quizIdx = 0;
         quizPts = 0;
@@ -359,17 +399,25 @@
             document.getElementById('btn-cert').classList.remove('hidden');
             fillCert();
         }
-        await callAPI({ action: "saveScore", name: loggedUser.name, hospital: loggedUser.hospital, score: quizPts });
+        await callAPI({
+            action: "saveScore",
+            username: loggedUser.username,
+            hospital: loggedUser.hospital,
+            score: quizPts
+        });
     }
 
+    // ===== CERTIFICATE =====
     function fillCert() {
-        document.getElementById('c-name').innerText = loggedUser.name;
+        // ✅ ใช้ fullname (ชื่อ-นามสกุลจริง) ในใบประกาศ
+        document.getElementById('c-name').innerText = loggedUser.fullname || loggedUser.username;
         document.getElementById('c-hosp').innerText = loggedUser.hospital || "รพ.ชลบุรี";
         document.getElementById('c-date').innerText = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
     }
 
+    // ===== ADMIN =====
     async function loadAdmin() {
-        document.getElementById('admin-table').innerHTML = '<tr><td colspan="5" class="text-center p-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>';
+        document.getElementById('admin-table').innerHTML = '<tr><td colspan="6" class="text-center p-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>';
         var res = await callAPI({ action: "getAdminData" });
         if (res.success && res.data && res.data.length > 0) {
             var html = '';
@@ -379,18 +427,19 @@
                     ? '<span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-600">' + u.score + '/10 (ผ่าน)</span>'
                     : '<span class="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-600">' + u.score + '/10 (ไม่ผ่าน)</span>';
                 html += '<tr class="hover:bg-slate-50 transition">' +
-                    '<td class="p-3 md:p-5 font-bold text-navy whitespace-nowrap">' + esc(u.name) + '</td>' +
+                    '<td class="p-3 md:p-5 font-bold text-navy whitespace-nowrap">' + esc(u.username) + '</td>' +
+                    '<td class="p-3 md:p-5 text-slate-700 font-medium whitespace-nowrap">' + esc(u.fullname) + '</td>' +
                     '<td class="p-3 md:p-5 text-slate-500 whitespace-nowrap">' + esc(u.hospital) + '</td>' +
                     '<td class="p-3 md:p-5 text-slate-500 font-mono bg-slate-50 rounded text-xs">' + esc(u.password) + '</td>' +
                     '<td class="p-3 md:p-5 whitespace-nowrap">' + scoreBadge + '</td>' +
-                    '<td class="p-3 md:p-5 whitespace-nowrap"><button onclick="changePassword(' + u.rowIdx + ', \'' + esc(u.name) + '\')" class="px-3 py-2 bg-amber-100 text-amber-600 rounded-lg text-xs font-bold hover:bg-amber-200 transition">เปลี่ยนรหัส</button></td>' +
+                    '<td class="p-3 md:p-5 whitespace-nowrap"><button onclick="changePassword(' + u.rowIdx + ', \'' + esc(u.username) + '\')" class="px-3 py-2 bg-amber-100 text-amber-600 rounded-lg text-xs font-bold hover:bg-amber-200 transition">เปลี่ยนรหัส</button></td>' +
                     '</tr>';
             }
             document.getElementById('admin-table').innerHTML = html;
         } else if (res.success) {
-            document.getElementById('admin-table').innerHTML = '<tr><td colspan="5" class="text-center p-8 text-slate-400">ยังไม่มีผู้ลงทะเบียน</td></tr>';
+            document.getElementById('admin-table').innerHTML = '<tr><td colspan="6" class="text-center p-8 text-slate-400">ยังไม่มีผู้ลงทะเบียน</td></tr>';
         } else {
-            document.getElementById('admin-table').innerHTML = '<tr><td colspan="5" class="text-center p-8 text-red-400">' + (res.message || 'โหลดไม่สำเร็จ') + '</td></tr>';
+            document.getElementById('admin-table').innerHTML = '<tr><td colspan="6" class="text-center p-8 text-red-400">' + (res.message || 'โหลดไม่สำเร็จ') + '</td></tr>';
         }
     }
 
@@ -416,6 +465,7 @@
         }
     }
 
+    // ===== UTILS =====
     function showToast(m, c) {
         var t = document.getElementById('toast');
         t.innerText = m;
